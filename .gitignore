@@ -2,4 +2,4 @@ __pycache__
 .env
 env
 *.db
-backend/test_db.db
+backend/*.db
