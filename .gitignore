@@ -7,3 +7,4 @@ test_db.db
 .pytest_cache
 htmlcov
 .coverage
+backend/test_db.db
