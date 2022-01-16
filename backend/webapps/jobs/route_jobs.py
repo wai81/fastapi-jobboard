@@ -17,6 +17,9 @@ from db.repository.jobs import create_new_job
 from apis.version1.route_login import get_current_user_from_token
 from webapps.jobs.forms import JobCreateForm
 
+from typing import Optional
+from db.repository.jobs import search_job
+
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(include_in_schema=False) # nclude_in_schema=False недобавляет в документацию API
 
@@ -62,3 +65,20 @@ async def create_job(request: Request, db: Session = Depends(get_db)):
             )
             return templates.TemplateResponse("jobs/create_job.html", form.__dict__)
     return templates.TemplateResponse("jobs/create_job.html", form.__dict__)
+
+@router.get("/delete-job/")
+def show_jobs_to_delete(request: Request,db : Session = Depends(get_db)):
+    jobs = list_jobs(db=db)
+    return templates.TemplateResponse("jobs/show_jobs_to_delete.html", {
+        "request":request,
+        "jobs":jobs
+    })
+    
+@router.get("/search/")
+def search(
+    request: Request, db: Session = Depends(get_db), query: Optional[str] = None
+):
+    jobs = search_job(query, db=db)
+    return templates.TemplateResponse(
+        "general_pages/homepage.html", {"request": request, "jobs": jobs}
+    )
