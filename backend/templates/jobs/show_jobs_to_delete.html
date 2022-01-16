@@ -46,7 +46,7 @@
 {% block scripts %} 
 <script type="text/javascript">
     function delete_job(id){
-        fetch('/jobs/delete/'+id,{
+        fetch('/job/delete/'+id,{
             method:'DELETE',
         })
         .then(response => response.json())

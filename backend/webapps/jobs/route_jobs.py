@@ -39,9 +39,10 @@ def job_detail(id:int, request:Request, db:Session=Depends(get_db)):
 
 @router.get("/post-a-job/")  
 def create_job(request: Request, db: Session = Depends(get_db)):
-    return templates.TemplateResponse("jobs/create_job.html", {"request": request})
+    return templates.TemplateResponse("jobs/create_job.html", 
+                                      {"request": request})
  
- 
+
 @router.post("/post-a-job/")
 async def create_job(request: Request, db: Session = Depends(get_db)):
     form = JobCreateForm(request)
@@ -66,13 +67,15 @@ async def create_job(request: Request, db: Session = Depends(get_db)):
             return templates.TemplateResponse("jobs/create_job.html", form.__dict__)
     return templates.TemplateResponse("jobs/create_job.html", form.__dict__)
 
+
 @router.get("/delete-job/")
-def show_jobs_to_delete(request: Request,db : Session = Depends(get_db)):
+def show_jobs_to_delete(request: Request, db: Session = Depends(get_db)):
     jobs = list_jobs(db=db)
     return templates.TemplateResponse("jobs/show_jobs_to_delete.html", {
         "request":request,
         "jobs":jobs
     })
+
     
 @router.get("/search/")
 def search(
@@ -80,5 +83,5 @@ def search(
 ):
     jobs = search_job(query, db=db)
     return templates.TemplateResponse(
-        "general_pages/homepage.html", {"request": request, "jobs": jobs}
+        "jobs/homepage.html", {"request": request, "jobs": jobs}
     )

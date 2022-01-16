@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from db.session import get_db
 from db.models.jobs import Job
-from db.repository.jobs import retreive_job
+from db.repository.jobs import retreive_job, search_job
 from db.models.users import User
 
 from schemas.jobs import JobCreate, ShowJob
@@ -52,14 +52,24 @@ def update_job(id:int,job:JobCreate,db:Session=Depends(get_db), current_user: Us
 
 
 @router.delete("/delete/{id}")
-def delete_job(id:int,db:Session=Depends(get_db), current_user: User=Depends(get_current_user_from_token)):
-    job =  retreive_job_by_id(id=id, db=db)
+def delete_job(id:int,db:Session=Depends(get_db),current_user:User=Depends(get_current_user_from_token)):
+    job = retreive_job(id=id, db=db)
+    
     if not job:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Job with ID:{id} dose not exist")
+        detail=f"Job with id {id} does not exist")
     if job.owner_id == current_user.id or current_user.is_superuser:
-        message = delete_job_by_id(id=id, db=db, owner_id=current_user.id)
+        delete_job_by_id(id=id, db=db, owner_id=current_user.id)
         return {"detail":"Job Successfully deleted"}
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail=f"You are not permited!!")
+    detail="You are not permitted!!")
+
+    
+@router.get("/autocomplete")
+def autocomplete(term: Optional[str] = None, db: Session = Depends(get_db)):
+    jobs = search_job(term, db=db)
+    job_titles = []
+    for job in jobs:
+        job_titles.append(job.title)
+    return job_titles
    
